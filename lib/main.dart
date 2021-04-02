@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:workshop2_bloc/bloc/hospital_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:loader_overlay/loader_overlay.dart';
+import 'package:workshop2_bloc/bloc/hospital_bloc.dart';
+import 'package:workshop2_bloc/data/model/hospitals.dart';
+import 'package:workshop2_bloc/data/repository/hospital_repository.dart';
 import 'dart:math' as Math;
 import 'MyObserver.dart';
 
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HospitalBloc(),
+      create: (context) => HospitalBloc(repository: HospitalsRepositoryImpl()),
       child: MaterialApp(
         title: 'Workshop 2 with BLOC',
         theme: ThemeData(
@@ -26,32 +27,41 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
   final String title;
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  HospitalBloc hospitalBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    hospitalBloc = BlocProvider.of<HospitalBloc>(context);
+    hospitalBloc.add(LoadHospitalEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(widget.title),
       ),
       body: BlocBuilder<HospitalBloc, HospitalState>(
         builder: (context, state) {
-          if (state is HospitalInitial) {
+          if (state is HospitalInitialState) {
             return Center(
-              child: ListView(
-                children: <Widget>[],
-              ),
+              child: CircularProgressIndicator(),
             );
-          } else if (state is HospitalLoading) {
-            return LoaderOverlay(
-              useDefaultLoading: true,
-              child: ListView(
-                children: <Widget>[],
-              ),
+          } else if (state is HospitalLoadingState) {
+            return Center(
+              child: CircularProgressIndicator(),
             );
-          } else if (state is HospitalFailed) {
+          } else if (state is HospitalFailedState) {
             return Center(
               child: Column(
                 children: [
@@ -67,17 +77,34 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             );
-          } else {
-            return Center(
-              child: ListView(
-                children: <Widget>[],
-              ),
-            );
+          } else if (state is HospitalLoadedState) {
+            return BuildList(state.hospitals);
           }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
   }
+}
+
+Widget BuildList(List<Hospital> hospitals) {
+  return ListView.builder(
+    itemCount: hospitals.length,
+    itemBuilder: (ctx, pos) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: InkWell(
+          child: ListTile(
+            title: Text(hospitals[pos].name),
+            subtitle: Text(hospitals[pos].tel),
+          ),
+          onTap: () {},
+        ),
+      );
+    },
+  );
 }
 
 double calcDistance(double lat1, double lon1, double lat2, double lon2) {
