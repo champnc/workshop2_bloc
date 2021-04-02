@@ -1,11 +1,12 @@
 part of 'hospital_bloc.dart';
 
-@immutable
-abstract class HospitalEvent {
+abstract class HospitalEvent extends Equatable{
   
 }
 
-class LoadingHospital extends HospitalEvent {
+class LoadHospitalEvent extends HospitalEvent {
+  @override
+  List<Object> get props => null;
 
 }
 
