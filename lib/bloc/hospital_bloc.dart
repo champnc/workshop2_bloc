@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -15,7 +14,7 @@ part 'hospital_state.dart';
 class HospitalBloc extends Bloc<HospitalEvent, HospitalState> {
   HospitalsRepository repository;
   MyLocation location;
-  HospitalBloc({HospitalsRepositoryImpl repository, @required this.location})
+  HospitalBloc({@required this.repository, @required this.location})
       : super(null);
 
   @override
@@ -27,9 +26,9 @@ class HospitalBloc extends Bloc<HospitalEvent, HospitalState> {
       try {
         var hospitals = await repository.getHospitals();
         hospitals.forEach((element) {
-          var idx = element.gps.indexOf(",");
-          var latitude = double.parse(element.gps.substring(0, idx).trim());
-          var longitude = double.parse(element.gps.substring(1, idx).trim());
+          var latLon = element.gps.split(",");
+          var latitude = double.parse(latLon[0].trim());
+          var longitude = double.parse(latLon[1].trim());
           element.distance = calcDistance(
               location.latitude, location.longitude, latitude, longitude);
         });

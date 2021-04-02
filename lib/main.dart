@@ -16,13 +16,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final _myLocation = MyLocation(13.723884, 100.529435);
     return BlocProvider(
-      create: (context) => HospitalBloc(repository: HospitalsRepositoryImpl(), location: _myLocation),
+      create: (context) => HospitalBloc(
+          repository: HospitalsRepositoryImpl(), location: _myLocation),
       child: MaterialApp(
         title: 'Workshop 2 with BLOC',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: HomePage(title: 'Flutter Demo Home Page'),
+        home: HomePage(title: 'Hospitals'),
       ),
     );
   }
@@ -49,8 +50,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(backgroundColor: kPrimaryColor,
         title: Text(widget.title),
+        centerTitle: true,
       ),
       body: BlocBuilder<HospitalBloc, HospitalState>(
         builder: (context, state) {
@@ -96,25 +98,33 @@ Widget BuildList(List<Hospital> hospitals) {
     itemCount: hospitals.length,
     itemBuilder: (ctx, pos) {
       return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: InkWell(
-          child: Row(
-            children: [
-              Text(
-                hospitals[pos].name,
-                style: TextStyle(color: kPrimaryColor),
-              ),
-              Text(
-                hospitals[pos].distance.toString(),
-                style: TextStyle(color: kPrimaryColor),
-              )
-            ],
-          ),
-          onTap: () {},
+        padding: const EdgeInsets.only(bottom: 20.0,left: 16.0,right: 16.0,top: 20.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              hospitals[pos].name,
+              style: TextStyle(color: kPrimaryColor),
+            ),
+            Text(
+              formatDistance(hospitals[pos].distance),
+              style: TextStyle(color: kPrimaryColor),
+            )
+          ],
         ),
       );
     },
   );
+}
+
+String formatDistance(double val) {
+  if (val > 1000) {
+    var km = (val / 1000);
+    return km.toStringAsFixed(km.truncateToDouble() == km ? 0 : 1) + " km";
+  } else {
+    var m = val;
+    return m.toStringAsFixed(m.truncateToDouble() == m ? 0 : 1) + " m";
+  }
 }
 
 const MaterialColor kPrimaryColor = const MaterialColor(
