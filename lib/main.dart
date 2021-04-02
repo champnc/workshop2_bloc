@@ -41,7 +41,13 @@ class HomePage extends StatelessWidget {
           if (state is HospitalInitial) {
             return Center(
               child: ListView(
-                children: <Widget>[],
+                children: <Widget>[
+                  Container(
+                    height: 50,
+                    color: Colors.amber[600],
+                    child: const Center(child: Text('Entry A')),
+                  ),
+                ],
               ),
             );
           } else if (state is HospitalLoading) {
