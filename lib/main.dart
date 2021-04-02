@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:workshop2_bloc/bloc/hospital_bloc.dart';
 import 'package:workshop2_bloc/data/model/hospitals.dart';
 import 'package:workshop2_bloc/data/repository/hospital_repository.dart';
-import 'dart:math' as Math;
 import 'MyObserver.dart';
+import 'data/model/my_location.dart';
 
 void main() {
   Bloc.observer = MyBlocObserver();
@@ -14,8 +14,9 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final _myLocation = MyLocation(13.723884, 100.529435);
     return BlocProvider(
-      create: (context) => HospitalBloc(repository: HospitalsRepositoryImpl()),
+      create: (context) => HospitalBloc(repository: HospitalsRepositoryImpl(), location: _myLocation),
       child: MaterialApp(
         title: 'Workshop 2 with BLOC',
         theme: ThemeData(
@@ -96,35 +97,23 @@ Widget BuildList(List<Hospital> hospitals) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: InkWell(
-          child: ListTile(
-            title: Text(hospitals[pos].name),
-            subtitle: Text(hospitals[pos].tel),
+          child: Row(
+            children: [
+              Text(
+                hospitals[pos].name,
+                style: TextStyle(color: kPrimaryColor),
+              ),
+              Text(
+                hospitals[pos].distance.toString(),
+                style: TextStyle(color: kPrimaryColor),
+              )
+            ],
           ),
           onTap: () {},
         ),
       );
     },
   );
-}
-
-double calcDistance(double lat1, double lon1, double lat2, double lon2) {
-  double r = 6371000.0;
-  double d2r = Math.pi / 180.0;
-
-  double rLat1 = lat1 * d2r;
-  double rLat2 = lat2 * d2r;
-
-  double dLat = (lat2 - lat1) * d2r;
-  double dLon = (lon2 - lon1) * d2r;
-
-  double a = (Math.sin(dLat / 2) * Math.sin(dLat / 2)) +
-      (Math.cos(rLat1) *
-          Math.cos(rLat2) *
-          (Math.sin(dLon / 2) * Math.sin(dLon / 2)));
-
-  double d = 2 * r * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return d;
 }
 
 const MaterialColor kPrimaryColor = const MaterialColor(

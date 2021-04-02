@@ -28,12 +28,14 @@ class Hospital {
     String location;
     String tel;
     String gps;
+    double distance;
 
     Hospital({
         this.name,
         this.location,
         this.tel,
         this.gps,
+        this.distance = 0.00
     });
 
     Hospital.fromJson(Map<String, dynamic> json) {
